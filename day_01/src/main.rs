@@ -1,7 +1,7 @@
 #[allow(unused_imports,dead_code,
     unused_variables)]
 
-    use day_01::Config;
+use day_01::Config;
 use std::process;
 use std::env;
 use std::time::Instant;
