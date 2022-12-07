@@ -7,10 +7,18 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug",
-            "program": "${workspaceFolder}/<executable file>",
+            "name": "Launch",
             "args": [],
-            "cwd": "${workspaceFolder}"
-        }
+            "program": "${workspaceFolder}/target/debug/boa",
+            "windows": {
+              "program": "${workspaceFolder}/target/debug/boa.exe"
+            },
+            "cwd": "${workspaceFolder}",
+            "stopOnEntry": false,
+            "sourceLanguages": ["rust"],
+            "sourceMap": {
+              "/rustc/*": "${env:HOME}/.rustup/toolchains/stable-x86_64-apple-darwin/lib/rustlib/src/rust"
+            }
+          }
     ]
 }
