@@ -11,7 +11,7 @@
             "args": [],
             "program": "${workspaceFolder}/target/debug/boa",
             "windows": {
-              "program": "${workspaceFolder}/target/debug/boa.exe"
+              "program": "${workspaceFolder}/day07/target/debug/boa.exe"
             },
             "cwd": "${workspaceFolder}",
             "stopOnEntry": false,
