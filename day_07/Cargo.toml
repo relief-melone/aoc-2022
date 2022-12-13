@@ -7,3 +7,11 @@ edition = "2021"
 
 [dependencies]
 atoi = "2"
+
+[[bin]]
+name = "day_07"
+path = "src/main.rs"
+
+[lib]
+name = "day_07"
+path = "src/lib.rs"

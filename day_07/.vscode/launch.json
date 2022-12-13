@@ -17,21 +17,24 @@
     {
       "type": "lldb",
       "request": "launch",
-      "name": "Debug unit tests in executable 'guessing_game'",
+      "name": "Unit tests",
       "cargo": {
         "args": [
           "test",
+          "--lib",
           "--no-run",
           "--bin=day_07",
-          "--package=day_07"
+          "--package=day_07",
+          "--",
+          "--nocapture",
         ],
         "filter": {
           "name": "day_07",
-          "kind": "bin"
+          "kind": "lib"
         }
       },
       "args": [],
-      "cwd": "${workspaceRoot}/day_07"
+      "cwd": "${workspaceFolder}"
     }
   ]
 }
