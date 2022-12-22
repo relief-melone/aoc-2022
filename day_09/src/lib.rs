@@ -1,5 +1,5 @@
 mod input_reader;
-use std::{cmp::{self, Ordering}, ops::Not, collections::HashMap, time::Instant, borrow::{BorrowMut, Borrow}, thread::current};
+use std::{collections::HashMap, time::Instant };
 
 pub fn part_01(){
     let started = Instant::now();
