@@ -1,17 +1,31 @@
 mod input_reader;
-use std::{cmp::{self, Ordering}, ops::Not, collections::HashMap, time::Instant};
+use std::{cmp::{self, Ordering}, ops::Not, collections::HashMap, time::Instant, borrow::{BorrowMut, Borrow}, thread::current};
 
 pub fn part_01(){
     let started = Instant::now();
     let lines = input_reader::read_lines("assets/input.txt");
-    let mut rope = Rope::new();
+    let mut rope = Rope::new(1);
 
     for line in lines {
         let movement = line_to_movement(&line);
         rope.move_head(movement);
     }
 
-    println!("Positions visited by tail: {}", rope.positions_visited_by_tail.len());
+    println!("Part 1 - Positions visited by tail: {}", rope.positions_visited_by_tail.len());
+    println!("Execution time: {:?}", Instant::now() - started);
+}
+
+pub fn part_02(){
+    let started = Instant::now();
+    let lines = input_reader::read_lines("assets/input.txt");
+    let mut rope = Rope::new(9);
+
+    for line in lines {
+        let movement = line_to_movement(&line);
+        rope.move_head(movement);
+    }
+
+    println!("Part 2 - Positions visited by tail: {}", rope.positions_visited_by_tail.len());
     println!("Execution time: {:?}", Instant::now() - started);
 }
 
@@ -23,26 +37,33 @@ pub enum Direction {
     L
 }
 
+#[derive(Clone, Debug, PartialEq)]
 struct Rope {
     head: (i32, i32),
-    tail: (i32, i32),
+    knots: Vec<(i32, i32)>,
     positions_visited_by_tail: HashMap<(i32, i32), bool>
 }
 
+
 impl Rope {
-    pub fn new() -> Self {
+    pub fn new(tail_length:i32) -> Self {
         let mut s = Self {
             head: (0,0),
-            tail: (0,0),
+            knots: vec![],
             positions_visited_by_tail: HashMap::new()
         };
+
+        for _ in 0..tail_length {
+            s.knots.push((0,0))
+        }
 
         s.positions_visited_by_tail.insert((0,0), true);
         s
 
     }
 
-    pub fn move_head(&mut self, steps: (Direction, i32)) -> (){
+    pub fn move_head(&mut self, steps: (Direction, i32)) -> (){       
+
         for _ in 0..steps.1 {
             match steps.0 {
                 Direction::L => self.head.0 -= 1,
@@ -50,40 +71,26 @@ impl Rope {
                 Direction::D => self.head.1 -= 1,
                 Direction::U => self.head.1 += 1
             }
-            self.move_tail(steps.0);
+
+            self.move_knots();
         }
 
     }
 
-    pub fn tail_and_head_detached(&self) -> bool {
-        (self.head.0 - self.tail.0).abs() > 1 || (self.head.1 - self.tail.1).abs() > 1
-    }
+    pub fn move_knots(&mut self) -> (){
+        let knot_len = &self.knots.len();
+        let mut parent = self.head;
+        for (index, knot) in self.knots.iter_mut().enumerate() {
+            *knot = move_knot(&knot, &parent);
+            parent = *knot;
 
-    pub fn move_tail(&mut self, head_moved: Direction) -> (){
-        
-        let incrementor =
-            match (head_moved, self.head.0.cmp(&self.tail.0), self.head.1.cmp(&self.tail.1)) {
-            (Direction::R, Ordering::Greater, Ordering::Equal) => (1,0),
-            (Direction::R, Ordering::Greater, Ordering::Greater) => (1,1),
-            (Direction::R, Ordering::Greater, Ordering::Less) => (1,-1),
-            (Direction::L, Ordering::Less, Ordering::Equal) => (-1,0),
-            (Direction::L, Ordering::Less, Ordering::Greater) => (-1,1),
-            (Direction::L, Ordering::Less, Ordering::Less) => (-1,-1),
-            (Direction::U, Ordering::Equal, Ordering::Greater) => (0,1),
-            (Direction::U, Ordering::Greater, Ordering::Greater) => (1,1),
-            (Direction::U, Ordering::Less, Ordering::Greater) => (-1,1),
-            (Direction::D, Ordering::Equal, Ordering::Less) => (0,-1),
-            (Direction::D, Ordering::Greater, Ordering::Less) => (1,-1),
-            (Direction::D, Ordering::Less, Ordering::Less) => (-1,-1),
-            _ => (0,0)
-        };
-
-        if self.tail_and_head_detached() {
-            self.tail.0 += incrementor.0;
-            self.tail.1 += incrementor.1;
-            self.positions_visited_by_tail.insert((self.tail.0, self.tail.1), true);
+            if index == *knot_len-1 {
+                self.positions_visited_by_tail.insert(*(knot), true);
+            }
         }
     }
+
+
 }
 
 pub fn line_to_movement(line:&str)-> (Direction, i32) {
@@ -97,6 +104,28 @@ pub fn line_to_movement(line:&str)-> (Direction, i32) {
         "D" => (Direction::D, steps),
         _ => panic!("{} is not a known direction", chars[0])
     }
+}
+
+pub fn knot_detached(current_knot: &(i32,i32), previous_knot:&(i32,i32)) -> bool {
+    (previous_knot.0 - current_knot.0).abs() > 1 || (previous_knot.1 - current_knot.1).abs() > 1
+}
+
+pub fn prev_is_horizontal_or_vertical(current_knot: &(i32,i32), previous_knot:&(i32,i32))-> bool{
+    previous_knot.0 - current_knot.0 == 0 || previous_knot.1 - current_knot.1 == 0
+}
+
+pub fn move_knot(current_knot: &(i32,i32), previous_knot: &(i32,i32)) -> (i32,i32){
+   
+    let dx = previous_knot.0.cmp(&current_knot.0);
+    let dy= previous_knot.1.cmp(&current_knot.1);
+    let inc = if knot_detached(current_knot, previous_knot) {        
+        (dx as i32, dy as i32)
+    } else {
+        (0,0)
+    };
+
+    (current_knot.0 + inc.0, current_knot.1 + inc.1) 
+
 }
 
 
@@ -127,7 +156,7 @@ mod test {
     #[test]
     fn rope_01(){
         let lines = input_reader::read_lines("assets/input_test_01.txt");
-        let mut rope = Rope::new();
+        let mut rope = Rope::new(1);
 
         for line in lines {
             let movement = line_to_movement(&line);
