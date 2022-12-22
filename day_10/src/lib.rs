@@ -9,7 +9,7 @@ pub enum Instruction {
 }
 pub struct CPU {
     instructions: VecDeque<Instruction>,
-    completed_cycles: i32,
+    cycle: i32,
     register: i32,
     current_instruction: Option<Instruction>,
     ticks_to_completion: i32,
@@ -36,7 +36,7 @@ impl CPU {
         let mut init_state = Self {
             current_instruction: None,
             instructions,
-            completed_cycles: 0,
+            cycle: 0,
             register: 1,
             ticks_to_completion: 0,
             sum_of_signal_strenghts: 0
@@ -47,17 +47,17 @@ impl CPU {
     } 
 
     pub fn signal_strengh(&self) -> i32{
-        self.completed_cycles * self.register
+        self.cycle * self.register
     }
 
     pub fn tick(&mut self)-> (){
 
-        self.completed_cycles += 1;
+        self.cycle += 1;
         self.ticks_to_completion -= 1;
 
-        if self.completed_cycles == 20 || (self.completed_cycles - 20) % 40 == 0 {
+        if self.cycle == 20 || (self.cycle - 20) % 40 == 0 {
             // println!("Adding new signal_strenght. Cycle: {}, Register: {}", self.completed_cycles, self.register);
-            self.sum_of_signal_strenghts += self.completed_cycles * self.register;
+            self.sum_of_signal_strenghts += self.cycle * self.register;
         }
 
         match &self.current_instruction {
@@ -118,7 +118,7 @@ mod test {
         let mut state = CPU::new("assets/input_test_01.txt");
         state.run();
 
-        assert_eq!(state.completed_cycles, 5);
+        assert_eq!(state.cycle, 5);
     }
 
     #[test]
