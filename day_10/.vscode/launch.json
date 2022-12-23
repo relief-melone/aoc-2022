@@ -11,9 +11,12 @@
             "cargo": {
                 "args": [
                     "test",
+                    "print_01",                    
                     "--no-run",
                     "--lib",
-                    "--package=day_10"
+                    "--package=day_10",
+                    "--",
+                    "--nocapture"
                 ],
                 "filter": {
                     "name": "day_10",

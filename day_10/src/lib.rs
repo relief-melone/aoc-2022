@@ -1,4 +1,4 @@
-use std::{collections::VecDeque, time::Instant};
+use std::{collections::{VecDeque, HashMap}, time::Instant};
 
 mod input_reader;
 
@@ -16,12 +16,63 @@ pub struct CPU {
     sum_of_signal_strenghts: i32,
 }
 
+pub struct Screen {
+    cpu: CPU,
+    pixels: HashMap<(i32,i32), bool>,
+    dimensions: (i32, i32)
+}
+
+
+
 pub fn part_01(){
     let started = Instant::now();
     let mut cpu = CPU::new("assets/input.txt");
     cpu.run();
     println!("Part 1 - Sum of signal strengths: {}", cpu.sum_of_signal_strenghts);
     println!("Execution time for part 1: {:?}", Instant::now() - started)
+}
+
+pub fn part_02(){
+    let started = Instant::now();
+    let mut screen = Screen::new("assets/input.txt", (40,6));
+
+    screen.load_pixels();
+    println!("Part 2");
+    screen.print();
+    println!("Execution time for part 2: {:?}", Instant::now() - started);   
+
+}
+
+impl Screen {
+    pub fn new(input:&str, dimensions: (i32, i32)) -> Self {
+        Self { 
+            cpu: CPU::new(input), 
+            pixels: HashMap::new(), 
+            dimensions: dimensions
+        }
+    }
+
+    pub fn load_pixels(&mut self){
+        for y in 0..self.dimensions.1 {
+            for x in 0..self.dimensions.0 {                
+                let current_register = self.cpu.register;
+                let pixel_visible = (current_register - x).abs() <= 1;
+                self.pixels.insert((x,y), pixel_visible);
+                self.cpu.tick();
+            }
+        }
+    }
+
+    pub fn print(&self){
+        for y in 0..self.dimensions.1 {
+            let mut line = "".to_string();
+            for x in 0..self.dimensions.0 {
+                line.push(if *self.pixels.get(&(x,y)).unwrap() { '▩' } else { ' '} )
+            }
+            println!("{}", line)
+        }
+    }
+
 
 }
 
@@ -127,5 +178,12 @@ mod test {
         state.run();
 
         assert_eq!(state.sum_of_signal_strenghts, 13140);
+    }
+
+    #[test]
+    fn print_01(){
+        let mut screen = Screen::new("assets/input_test_02.txt", (40,6));
+        screen.load_pixels();
+        screen.print();
     }
 }
