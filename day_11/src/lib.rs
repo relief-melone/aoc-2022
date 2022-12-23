@@ -43,13 +43,34 @@ pub fn part_01(){
     let mut monkeys = parse_monkeys(&input);
     
     for _round_nr in 0..20 {
-        execute_round(&mut monkeys)
+        execute_round(&mut monkeys, 0)
     }
 
     monkeys.sort_by(|a,b| b.items_inspected.cmp(&a.items_inspected) );
 
     println!("Part 1 - Level of monkey business: {:#?}", monkeys[0].items_inspected * monkeys[1].items_inspected);
     println!("Execution time for part 1: {:?}", Instant::now()-started);
+}
+
+pub fn part_02(){
+    let started = Instant::now();
+    let binding = input_reader::read_lines("assets/input.txt");
+    let input: Vec<&str> = binding 
+    .iter()
+    .map(|s|{s as &str})
+    .collect::<Vec<&str>>();
+
+    let mut monkeys = parse_monkeys(&input);
+    let super_modulo = monkeys.iter().fold(1, |sum, val|{ sum * val.test.divide_condition });
+    
+    for _round_nr in 0..10000 {
+        execute_round(&mut monkeys, super_modulo)
+    }
+
+    monkeys.sort_by(|a,b| b.items_inspected.cmp(&a.items_inspected) );
+
+    println!("Part 2 - Level of monkey business: {:#?}", monkeys[0].items_inspected * monkeys[1].items_inspected );
+    println!("Execution time for part 2: {:?}", Instant::now()-started);
 }
 
 
@@ -130,7 +151,7 @@ pub fn parse_monkeys(lines: &Vec<&str>) -> Vec<Monkey> {
 
 }
 
-pub fn execute_round(monkeys: &mut Vec<Monkey>){
+pub fn execute_round(monkeys: &mut Vec<Monkey>, super_modulo: i64){
 
     for monkey_index in 0..monkeys.len() {
         let operand = monkeys[monkey_index].operation.operand;
@@ -146,7 +167,12 @@ pub fn execute_round(monkeys: &mut Vec<Monkey>){
                 Operator::PlusSelf => item + item,
             };
             
-            item = item/3;      
+            if super_modulo == 0 {
+                item = item/3;
+            } else {
+                item = item % super_modulo;
+            }
+
             monkeys[monkey_index as usize].items_inspected += 1;
             
             if item % monkeys[monkey_index as usize].test.divide_condition == 0 {
@@ -317,7 +343,7 @@ mod test {
             "    If false: throw to monkey 1",
         ]);
 
-       execute_round(&mut monkeys);
+       execute_round(&mut monkeys, 0);
 
         assert_eq!(monkeys[0].items, vec![20,23,27,26]);
         assert_eq!(monkeys[1].items, vec![2080,25,167,207,401,1046]);
