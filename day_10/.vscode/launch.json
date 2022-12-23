@@ -11,7 +11,6 @@
             "cargo": {
                 "args": [
                     "test",
-                    "print_01",                    
                     "--no-run",
                     "--lib",
                     "--package=day_10",
