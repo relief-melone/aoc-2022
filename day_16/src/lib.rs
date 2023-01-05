@@ -52,8 +52,8 @@ pub struct VolcanoState {
 }
 impl Hash for VolcanoState {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.open_valves.hash(state);
-        self.current_positon.hash(state);
+        // self.open_valves.hash(state);
+        // self.current_positon.hash(state);
         self.current_flow.hash(state);
         self.pressure_released.hash(state);
         self.time_left.hash(state);
@@ -61,9 +61,10 @@ impl Hash for VolcanoState {
 }
 impl PartialEq for VolcanoState {
     fn eq(&self, other: &Self) -> bool {
-        self.open_valves == other.open_valves
-        && self.current_positon == other.current_positon        
-        && self.current_flow == other.current_flow
+        // self.open_valves == other.open_valves
+        self.current_positon == other.current_positon        
+        // && self.current_flow == other.current_flow
+        // self.time_left == other.time_left
     }
 }
 impl Eq for VolcanoState {}
