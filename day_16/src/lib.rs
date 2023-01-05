@@ -220,7 +220,6 @@ impl VolcanoStateGraph {
                     if !self.visited_states.contains(&new_state) {
                         self.to_visit.push(new_state.clone());
                     }
-                    
                 }
             });
         }
@@ -271,7 +270,6 @@ mod test {
         state_02.open_valves.insert(('A','A'));
         state_02.open_valves.insert(('B','B'));
 
-
         let mut hs:HashSet<VolcanoState> = HashSet::new();
         hs.insert(state_01.clone());
 
@@ -284,7 +282,5 @@ mod test {
         let max_pressure_released = part_01(Some("assets/input_test_01.txt"));        
 
         assert_eq!(max_pressure_released, 1651)
-        
     }
-
 }
