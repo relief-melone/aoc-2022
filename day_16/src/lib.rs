@@ -182,19 +182,19 @@ impl VolcanoStateGraph {
 
     fn run(&mut self){
 
-        let mut i:usize = 0;
+        // let mut i:usize = 0;
         
         while let Some(s) = self.to_visit.pop() {
             self.visited_states.insert(s.clone());
 
-            if i % 100000 == 0 {
-                println!("{}: \tto_visit: {:?}, current_pressure: {}, valves_open: {}, time_left: {}, max_pressure: {}, visited: {}", i , self.to_visit.len(), s.pressure_released, s.open_valves.len(), s.time_left, self.get_max_pressure(), self.visited_states.len());
-            }
+            // if i % 100000 == 0 {
+            //     println!("{}: \tto_visit: {:?}, current_pressure: {}, valves_open: {}, time_left: {}, max_pressure: {}, visited: {}", i , self.to_visit.len(), s.pressure_released, s.open_valves.len(), s.time_left, self.get_max_pressure(), self.visited_states.len());
+            // }
 
             if s.time_left == 0 { continue; }
 
             let current_valve = self.get_current_valve(&s);
-            i += 1;
+            // i += 1;
 
             self
             .get_valve(&s.current_positon)
