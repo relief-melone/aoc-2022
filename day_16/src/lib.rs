@@ -41,7 +41,7 @@ impl Valve {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq)]
 // #[derive(Debug, Clone, PartialEq, Hash, Eq)]
 pub struct VolcanoState {
     open_valves: BTreeSet<(char,char)>,
@@ -53,7 +53,7 @@ pub struct VolcanoState {
 impl Hash for VolcanoState {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         // self.open_valves.hash(state);
-        // self.current_positon.hash(state);
+        self.current_positon.hash(state);
         self.current_flow.hash(state);
         self.pressure_released.hash(state);
         self.time_left.hash(state);
@@ -63,11 +63,12 @@ impl PartialEq for VolcanoState {
     fn eq(&self, other: &Self) -> bool {
         // self.open_valves == other.open_valves
         self.current_positon == other.current_positon        
-        // && self.current_flow == other.current_flow
-        // self.time_left == other.time_left
+        && self.current_flow == other.current_flow
+        && self.pressure_released == other.pressure_released
+        && self.time_left == other.time_left
     }
 }
-impl Eq for VolcanoState {}
+// impl Eq for VolcanoState {}
 
 impl VolcanoState {
     fn new() -> Self {
